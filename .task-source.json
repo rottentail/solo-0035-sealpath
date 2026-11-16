@@ -1,0 +1,6141 @@
+{
+  "task_source_schema_version": 1,
+  "cc_feedback_profile": "cc-feedback-2611",
+  "project_domain": "安全",
+  "project_subdirection": "其他",
+  "supported_task_types": [
+    "功能开发",
+    "代码重构",
+    "功能优化",
+    "依赖升级与迁移",
+    "质量保障",
+    "项目维护",
+    "技术讨论",
+    "问题排查与诊断",
+    "部署运维",
+    "泛Agent需求"
+  ],
+  "type_coverage": {
+    "功能开发": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go"
+      ]
+    },
+    "Bugfix": {
+      "status": "no_verified_defect",
+      "reason": "健康基线未确认需要修复的真实缺陷，按需另行预埋",
+      "source_anchors": []
+    },
+    "代码重构": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/verification/evaluate.go",
+        "internal/revocation/check.go"
+      ]
+    },
+    "功能优化": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go"
+      ]
+    },
+    "依赖升级与迁移": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/repository/integrity.go"
+      ]
+    },
+    "质量保障": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go"
+      ]
+    },
+    "项目维护": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/transport/inputs.go",
+        "internal/verification/evaluate.go"
+      ]
+    },
+    "技术讨论": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ]
+    },
+    "问题排查与诊断": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go"
+      ]
+    },
+    "部署运维": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "deploy/Dockerfile",
+        "cmd/sealpath/main.go"
+      ]
+    },
+    "泛Agent需求": {
+      "status": "supported",
+      "reason": "基线已有对应领域工作流和可独立构造的交付输入；平台适用性须在逐题准入核实",
+      "source_anchors": [
+        "internal/codec/certificates.go",
+        "internal/chain/build.go"
+      ]
+    }
+  },
+  "entities": [
+    {
+      "id": "certificate",
+      "label": "证书"
+    },
+    {
+      "id": "trust_set",
+      "label": "信任集合"
+    },
+    {
+      "id": "artifact",
+      "label": "制品"
+    },
+    {
+      "id": "signature",
+      "label": "分离签名"
+    },
+    {
+      "id": "revocation_list",
+      "label": "撤销列表"
+    },
+    {
+      "id": "policy",
+      "label": "验证策略"
+    },
+    {
+      "id": "decision",
+      "label": "验证决定"
+    },
+    {
+      "id": "material",
+      "label": "决定证据"
+    },
+    {
+      "id": "bundle",
+      "label": "证据包"
+    },
+    {
+      "id": "event",
+      "label": "接收事件"
+    }
+  ],
+  "state_machines": [
+    {
+      "subject": "trust_set",
+      "states": [
+        "absent",
+        "active",
+        "retired"
+      ],
+      "transitions": [
+        "absent->active",
+        "active->active",
+        "active->retired"
+      ]
+    },
+    {
+      "subject": "certificate",
+      "states": [
+        "unparsed",
+        "parsed",
+        "accepted",
+        "rejected"
+      ],
+      "transitions": [
+        "unparsed->parsed",
+        "parsed->accepted",
+        "unparsed->rejected"
+      ]
+    },
+    {
+      "subject": "signature",
+      "states": [
+        "received",
+        "cryptographically_valid",
+        "accepted",
+        "rejected"
+      ],
+      "transitions": [
+        "received->cryptographically_valid",
+        "cryptographically_valid->accepted",
+        "received->rejected"
+      ]
+    },
+    {
+      "subject": "revocation_list",
+      "states": [
+        "received",
+        "issuer_verified",
+        "accepted",
+        "superseded"
+      ],
+      "transitions": [
+        "received->issuer_verified",
+        "issuer_verified->accepted",
+        "accepted->superseded"
+      ]
+    },
+    {
+      "subject": "decision",
+      "states": [
+        "requested",
+        "evidence_captured",
+        "trusted",
+        "rejected",
+        "indeterminate",
+        "trusted_with_warning"
+      ],
+      "transitions": [
+        "requested->evidence_captured",
+        "evidence_captured->trusted",
+        "evidence_captured->rejected",
+        "evidence_captured->indeterminate",
+        "evidence_captured->trusted_with_warning"
+      ]
+    }
+  ],
+  "capability_families": [
+    {
+      "family": "验证对象与证据身份",
+      "source_paths": [
+        "internal/model"
+      ],
+      "occupied_by": [
+        "model"
+      ],
+      "available": true
+    },
+    {
+      "family": "DER、PEM与确定JSON身份",
+      "source_paths": [
+        "internal/codec"
+      ],
+      "occupied_by": [
+        "codec"
+      ],
+      "available": true
+    },
+    {
+      "family": "状态原子持久化及引用完整性",
+      "source_paths": [
+        "internal/repository"
+      ],
+      "occupied_by": [
+        "repository"
+      ],
+      "available": true
+    },
+    {
+      "family": "证书接收及根集合生命周期",
+      "source_paths": [
+        "internal/authority"
+      ],
+      "occupied_by": [
+        "authority"
+      ],
+      "available": true
+    },
+    {
+      "family": "代码签名证书路径构造",
+      "source_paths": [
+        "internal/chain"
+      ],
+      "occupied_by": [
+        "chain"
+      ],
+      "available": true
+    },
+    {
+      "family": "CRL接收与时点撤销判断",
+      "source_paths": [
+        "internal/revocation"
+      ],
+      "occupied_by": [
+        "revocation"
+      ],
+      "available": true
+    },
+    {
+      "family": "制品内容与摘要",
+      "source_paths": [
+        "internal/artifact"
+      ],
+      "occupied_by": [
+        "artifact"
+      ],
+      "available": true
+    },
+    {
+      "family": "分离签名密码学校验",
+      "source_paths": [
+        "internal/signature"
+      ],
+      "occupied_by": [
+        "signature"
+      ],
+      "available": true
+    },
+    {
+      "family": "版本化安全规则与约束判断",
+      "source_paths": [
+        "internal/policy"
+      ],
+      "occupied_by": [
+        "policy"
+      ],
+      "available": true
+    },
+    {
+      "family": "固定证据并组合验证决定",
+      "source_paths": [
+        "internal/verification"
+      ],
+      "occupied_by": [
+        "verification"
+      ],
+      "available": true
+    },
+    {
+      "family": "原证据导出、重放与差异解释",
+      "source_paths": [
+        "internal/evidence"
+      ],
+      "occupied_by": [
+        "evidence"
+      ],
+      "available": true
+    },
+    {
+      "family": "HTTP输入输出、限额与错误语义",
+      "source_paths": [
+        "internal/transport"
+      ],
+      "occupied_by": [
+        "transport"
+      ],
+      "available": true
+    }
+  ],
+  "extension_seams": [
+    {
+      "id": "quorum",
+      "anchor": "internal/signature/ingest.go",
+      "entry": "verify",
+      "distinct_outcome": "quorum 可挂接的独立证据能力",
+      "mechanism": "authorization"
+    },
+    {
+      "id": "ocsp",
+      "anchor": "internal/revocation/import.go",
+      "entry": "revocation",
+      "distinct_outcome": "ocsp 可挂接的独立证据能力",
+      "mechanism": "time_semantics"
+    },
+    {
+      "id": "timestamp",
+      "anchor": "internal/signature/verify.go",
+      "entry": "verify",
+      "distinct_outcome": "timestamp 可挂接的独立证据能力",
+      "mechanism": "lineage"
+    },
+    {
+      "id": "transparency",
+      "anchor": "internal/evidence/bundle.go",
+      "entry": "bundle",
+      "distinct_outcome": "transparency 可挂接的独立证据能力",
+      "mechanism": "snapshot_consistency"
+    },
+    {
+      "id": "delegation",
+      "anchor": "internal/signature/ingest.go",
+      "entry": "signature",
+      "distinct_outcome": "delegation 可挂接的独立证据能力",
+      "mechanism": "policy_rules"
+    },
+    {
+      "id": "dsse",
+      "anchor": "internal/signature/verify.go",
+      "entry": "signature",
+      "distinct_outcome": "dsse 可挂接的独立证据能力",
+      "mechanism": "policy_rules"
+    },
+    {
+      "id": "digest-agility",
+      "anchor": "internal/artifact/ingest.go",
+      "entry": "artifact",
+      "distinct_outcome": "digest-agility 可挂接的独立证据能力",
+      "mechanism": "versioning_audit"
+    },
+    {
+      "id": "dependency-attestation",
+      "anchor": "internal/artifact/ingest.go",
+      "entry": "verify",
+      "distinct_outcome": "dependency-attestation 可挂接的独立证据能力",
+      "mechanism": "lineage"
+    },
+    {
+      "id": "signed-bundle",
+      "anchor": "internal/evidence/bundle.go",
+      "entry": "bundle",
+      "distinct_outcome": "signed-bundle 可挂接的独立证据能力",
+      "mechanism": "authorization"
+    },
+    {
+      "id": "trust-promotion",
+      "anchor": "internal/authority/trust.go",
+      "entry": "trust",
+      "distinct_outcome": "trust-promotion 可挂接的独立证据能力",
+      "mechanism": "state_machine"
+    },
+    {
+      "id": "key-continuity",
+      "anchor": "internal/authority/certificates.go",
+      "entry": "signature",
+      "distinct_outcome": "key-continuity 可挂接的独立证据能力",
+      "mechanism": "versioning_audit"
+    },
+    {
+      "id": "policy-trial",
+      "anchor": "internal/policy/service.go",
+      "entry": "policy",
+      "distinct_outcome": "policy-trial 可挂接的独立证据能力",
+      "mechanism": "policy_rules"
+    },
+    {
+      "id": "crl-delta",
+      "anchor": "internal/revocation/import.go",
+      "entry": "revocation",
+      "distinct_outcome": "crl-delta 可挂接的独立证据能力",
+      "mechanism": "recovery_rollback"
+    },
+    {
+      "id": "constraints-profile",
+      "anchor": "internal/policy/service.go",
+      "entry": "policy",
+      "distinct_outcome": "constraints-profile 可挂接的独立证据能力",
+      "mechanism": "authorization"
+    },
+    {
+      "id": "release-set",
+      "anchor": "internal/artifact/ingest.go",
+      "entry": "artifact",
+      "distinct_outcome": "release-set 可挂接的独立证据能力",
+      "mechanism": "snapshot_consistency"
+    },
+    {
+      "id": "witness-receipt",
+      "anchor": "internal/verification/service.go",
+      "entry": "verify",
+      "distinct_outcome": "witness-receipt 可挂接的独立证据能力",
+      "mechanism": "concurrency"
+    },
+    {
+      "id": "counter-sign",
+      "anchor": "internal/signature/verify.go",
+      "entry": "signature",
+      "distinct_outcome": "counter-sign 可挂接的独立证据能力",
+      "mechanism": "lineage"
+    },
+    {
+      "id": "revocation-reassessment",
+      "anchor": "internal/revocation/import.go",
+      "entry": "revocation",
+      "distinct_outcome": "revocation-reassessment 可挂接的独立证据能力",
+      "mechanism": "recovery_rollback"
+    },
+    {
+      "id": "certificate-pins",
+      "anchor": "internal/authority/trust.go",
+      "entry": "trust",
+      "distinct_outcome": "certificate-pins 可挂接的独立证据能力",
+      "mechanism": "authorization"
+    },
+    {
+      "id": "statement-binding",
+      "anchor": "internal/artifact/ingest.go",
+      "entry": "signature",
+      "distinct_outcome": "statement-binding 可挂接的独立证据能力",
+      "mechanism": "policy_rules"
+    },
+    {
+      "id": "secure-time-source",
+      "anchor": "internal/signature/ingest.go",
+      "entry": "verify",
+      "distinct_outcome": "以可验证时间来源替代接收方自报时刻",
+      "mechanism": "authorization"
+    },
+    {
+      "id": "trusted-material-replication",
+      "anchor": "internal/repository/store.go",
+      "entry": "restart",
+      "distinct_outcome": "在不同接收方之间传递经认可的证据材料",
+      "mechanism": "snapshot_consistency"
+    },
+    {
+      "id": "signed-policy-distribution",
+      "anchor": "internal/policy/service.go",
+      "entry": "policy",
+      "distinct_outcome": "核验策略发行者签名与接收方认可范围",
+      "mechanism": "policy_rules"
+    },
+    {
+      "id": "external-root-restrictions",
+      "anchor": "internal/authority/trust.go",
+      "entry": "trust",
+      "distinct_outcome": "把接收方独立的根约束与材料链绑定",
+      "mechanism": "state_machine"
+    },
+    {
+      "id": "evidence-search",
+      "anchor": "internal/evidence/compare.go",
+      "entry": "compare",
+      "distinct_outcome": "按被影响的证据关系查找历史决定",
+      "mechanism": "lineage"
+    }
+  ],
+  "tension_points": [
+    {
+      "workflow_id": "certificates",
+      "description": "证书内容身份与接收表示不同",
+      "observable_failure": "拒绝破损或多证书混合材料"
+    },
+    {
+      "workflow_id": "trust",
+      "description": "根集合更新与签名判断固定版本",
+      "observable_failure": "拒绝非自签CA和过期修订提交"
+    },
+    {
+      "workflow_id": "artifact",
+      "description": "重复内容去重与内容来源解释不同",
+      "observable_failure": "内容不符或容量不足时拒绝"
+    },
+    {
+      "workflow_id": "signature",
+      "description": "签名成立不能代表证书受信",
+      "observable_failure": "错误签名与缺失引用拒绝"
+    },
+    {
+      "workflow_id": "policy",
+      "description": "当前策略变动与历史判断隔离",
+      "observable_failure": "非法算法与版本冲突拒绝"
+    },
+    {
+      "workflow_id": "revocation",
+      "description": "接收时间不等于撤销事实生效时间",
+      "observable_failure": "错误签发者和回退序号拒绝"
+    },
+    {
+      "workflow_id": "verify",
+      "description": "安全要求与证据不足下的可用性",
+      "observable_failure": "非法引用请求拒绝；失效证据产生拒绝决定"
+    },
+    {
+      "workflow_id": "unknown",
+      "description": "不确定与密码学失败属于不同事实",
+      "observable_failure": "不会把缺证据误写成未撤销"
+    },
+    {
+      "workflow_id": "history",
+      "description": "当前规则不能覆盖历史认可依据",
+      "observable_failure": "不存在的决定引用返回明确错误"
+    },
+    {
+      "workflow_id": "bundle",
+      "description": "内部自洽不证明接收方认可信任来源",
+      "observable_failure": "拒绝内容损坏及不能复现的决定"
+    },
+    {
+      "workflow_id": "compare",
+      "description": "最终结论相同不代表判断依据相同",
+      "observable_failure": "拒绝不存在的决定"
+    },
+    {
+      "workflow_id": "restart",
+      "description": "单进程原子写入与故障恢复",
+      "observable_failure": "损坏或不兼容状态拒绝启动"
+    },
+    {
+      "workflow_id": "retire",
+      "description": "停止新信任不能抹掉旧依据",
+      "observable_failure": "过期修订和重复退役拒绝"
+    }
+  ],
+  "prompt_contract": {
+    "schema_version": 1,
+    "mode": "integrated",
+    "baseline_tier": "deep-task-ready",
+    "generation_scope": {
+      "mode": "all_supported"
+    },
+    "minimum_active_prompts": {
+      "功能开发": 20,
+      "代码重构": 2,
+      "功能优化": 20,
+      "依赖升级与迁移": 2,
+      "质量保障": 2,
+      "项目维护": 2,
+      "技术讨论": 2,
+      "问题排查与诊断": 2,
+      "部署运维": 2,
+      "泛Agent需求": 10
+    },
+    "minimum_anchors": {
+      "功能开发": 25,
+      "代码重构": 15,
+      "功能优化": 25,
+      "依赖升级与迁移": 15,
+      "质量保障": 15,
+      "项目维护": 15,
+      "技术讨论": 15,
+      "问题排查与诊断": 15,
+      "部署运维": 15,
+      "泛Agent需求": 15
+    },
+    "capacity_floor": {
+      "modules": 8,
+      "workflows": 10,
+      "mechanisms": 8,
+      "entities": 8,
+      "state_machines": 5,
+      "extension_seams": 12,
+      "tension_points": 10
+    }
+  },
+  "prompt_anchors": [
+    {
+      "id": "quorum",
+      "task_type": "功能开发",
+      "capability_family": "quorum",
+      "subject": "quorum",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "extension_seam_id": "quorum"
+    },
+    {
+      "id": "ocsp",
+      "task_type": "功能开发",
+      "capability_family": "ocsp",
+      "subject": "ocsp",
+      "state": "revocation",
+      "invariant": "接收时间不等于撤销事实生效时间",
+      "observable": "错误签发者和回退序号拒绝",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "extension_seam_id": "ocsp"
+    },
+    {
+      "id": "timestamp",
+      "task_type": "功能开发",
+      "capability_family": "timestamp",
+      "subject": "timestamp",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/signature/verify.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/verify.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Verify",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "extension_seam_id": "timestamp"
+    },
+    {
+      "id": "transparency",
+      "task_type": "功能开发",
+      "capability_family": "transparency",
+      "subject": "transparency",
+      "state": "bundle",
+      "invariant": "内部自洽不证明接收方认可信任来源",
+      "observable": "拒绝内容损坏及不能复现的决定",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/service.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Create",
+          "Select"
+        ]
+      },
+      "extension_seam_id": "transparency"
+    },
+    {
+      "id": "delegation",
+      "task_type": "功能开发",
+      "capability_family": "delegation",
+      "subject": "delegation",
+      "state": "signature",
+      "invariant": "签名成立不能代表证书受信",
+      "observable": "错误签名与缺失引用拒绝",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "extension_seam_id": "delegation"
+    },
+    {
+      "id": "dsse",
+      "task_type": "功能开发",
+      "capability_family": "dsse",
+      "subject": "dsse",
+      "state": "signature",
+      "invariant": "签名成立不能代表证书受信",
+      "observable": "错误签名与缺失引用拒绝",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/verify.go",
+        "internal/artifact/ingest.go",
+        "internal/verification/material.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/verify.go",
+          "internal/artifact/ingest.go",
+          "internal/verification/material.go"
+        ],
+        "functions": [
+          "Verify",
+          "Import",
+          "Capture"
+        ]
+      },
+      "extension_seam_id": "dsse"
+    },
+    {
+      "id": "digest-agility",
+      "task_type": "功能开发",
+      "capability_family": "digest-agility",
+      "subject": "digest-agility",
+      "state": "artifact",
+      "invariant": "重复内容去重与内容来源解释不同",
+      "observable": "内容不符或容量不足时拒绝",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "extension_seam_id": "digest-agility"
+    },
+    {
+      "id": "dependency-attestation",
+      "task_type": "功能开发",
+      "capability_family": "dependency-attestation",
+      "subject": "dependency-attestation",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "extension_seam_id": "dependency-attestation"
+    },
+    {
+      "id": "signed-bundle",
+      "task_type": "功能开发",
+      "capability_family": "signed-bundle",
+      "subject": "signed-bundle",
+      "state": "bundle",
+      "invariant": "内部自洽不证明接收方认可信任来源",
+      "observable": "拒绝内容损坏及不能复现的决定",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/service.go",
+        "internal/authority/trust.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/service.go",
+          "internal/authority/trust.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Verify",
+          "PutTrust",
+          "Retire"
+        ]
+      },
+      "extension_seam_id": "signed-bundle"
+    },
+    {
+      "id": "trust-promotion",
+      "task_type": "功能开发",
+      "capability_family": "trust-promotion",
+      "subject": "trust-promotion",
+      "state": "trust",
+      "invariant": "根集合更新与签名判断固定版本",
+      "observable": "拒绝非自签CA和过期修订提交",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "extension_seam_id": "trust-promotion"
+    },
+    {
+      "id": "key-continuity",
+      "task_type": "功能开发",
+      "capability_family": "key-continuity",
+      "subject": "key-continuity",
+      "state": "signature",
+      "invariant": "签名成立不能代表证书受信",
+      "observable": "错误签名与缺失引用拒绝",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/signature/verify.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/signature/verify.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Verify",
+          "Evaluate"
+        ]
+      },
+      "extension_seam_id": "key-continuity"
+    },
+    {
+      "id": "policy-trial",
+      "task_type": "功能开发",
+      "capability_family": "policy-trial",
+      "subject": "policy-trial",
+      "state": "policy",
+      "invariant": "当前策略变动与历史判断隔离",
+      "observable": "非法算法与版本冲突拒绝",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "extension_seam_id": "policy-trial"
+    },
+    {
+      "id": "crl-delta",
+      "task_type": "功能开发",
+      "capability_family": "crl-delta",
+      "subject": "crl-delta",
+      "state": "revocation",
+      "invariant": "接收时间不等于撤销事实生效时间",
+      "observable": "错误签发者和回退序号拒绝",
+      "primary_mechanism": "recovery_rollback",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/material.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/material.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Capture"
+        ]
+      },
+      "extension_seam_id": "crl-delta"
+    },
+    {
+      "id": "constraints-profile",
+      "task_type": "功能开发",
+      "capability_family": "constraints-profile",
+      "subject": "constraints-profile",
+      "state": "policy",
+      "invariant": "当前策略变动与历史判断隔离",
+      "observable": "非法算法与版本冲突拒绝",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "extension_seam_id": "constraints-profile"
+    },
+    {
+      "id": "release-set",
+      "task_type": "功能开发",
+      "capability_family": "release-set",
+      "subject": "release-set",
+      "state": "artifact",
+      "invariant": "重复内容去重与内容来源解释不同",
+      "observable": "内容不符或容量不足时拒绝",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate"
+        ]
+      },
+      "extension_seam_id": "release-set"
+    },
+    {
+      "id": "witness-receipt",
+      "task_type": "功能开发",
+      "capability_family": "witness-receipt",
+      "subject": "witness-receipt",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "concurrency",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go",
+        "internal/authority/trust.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go",
+          "internal/authority/trust.go"
+        ],
+        "functions": [
+          "Verify",
+          "digest",
+          "Export",
+          "Replay",
+          "PutTrust",
+          "Retire"
+        ]
+      },
+      "extension_seam_id": "witness-receipt"
+    },
+    {
+      "id": "counter-sign",
+      "task_type": "功能开发",
+      "capability_family": "counter-sign",
+      "subject": "counter-sign",
+      "state": "signature",
+      "invariant": "签名成立不能代表证书受信",
+      "observable": "错误签名与缺失引用拒绝",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/signature/verify.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/verify.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Verify",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "extension_seam_id": "counter-sign"
+    },
+    {
+      "id": "revocation-reassessment",
+      "task_type": "功能开发",
+      "capability_family": "revocation-reassessment",
+      "subject": "revocation-reassessment",
+      "state": "revocation",
+      "invariant": "接收时间不等于撤销事实生效时间",
+      "observable": "错误签发者和回退序号拒绝",
+      "primary_mechanism": "recovery_rollback",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/verification/service.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/verification/service.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Import",
+          "Verify",
+          "Compare"
+        ]
+      },
+      "extension_seam_id": "revocation-reassessment"
+    },
+    {
+      "id": "certificate-pins",
+      "task_type": "功能开发",
+      "capability_family": "certificate-pins",
+      "subject": "certificate-pins",
+      "state": "trust",
+      "invariant": "根集合更新与签名判断固定版本",
+      "observable": "拒绝非自签CA和过期修订提交",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "extension_seam_id": "certificate-pins"
+    },
+    {
+      "id": "statement-binding",
+      "task_type": "功能开发",
+      "capability_family": "statement-binding",
+      "subject": "statement-binding",
+      "state": "signature",
+      "invariant": "签名成立不能代表证书受信",
+      "observable": "错误签名与缺失引用拒绝",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/verify.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/verify.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Verify",
+          "Evaluate"
+        ]
+      },
+      "extension_seam_id": "statement-binding"
+    },
+    {
+      "id": "chain-import",
+      "task_type": "功能优化",
+      "capability_family": "chain-import",
+      "subject": "chain-import",
+      "state": "certificates",
+      "invariant": "证书内容身份与接收表示不同",
+      "observable": "拒绝破损或多证书混合材料",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ]
+    },
+    {
+      "id": "path-choice",
+      "task_type": "功能优化",
+      "capability_family": "path-choice",
+      "subject": "path-choice",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "ranking_reorder",
+      "source_anchors": [
+        "internal/chain/build.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/chain/build.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Build",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "root-update-impact",
+      "task_type": "功能优化",
+      "capability_family": "root-update-impact",
+      "subject": "root-update-impact",
+      "state": "trust",
+      "invariant": "根集合更新与签名判断固定版本",
+      "observable": "拒绝非自签CA和过期修订提交",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ]
+    },
+    {
+      "id": "repeat-receipt",
+      "task_type": "功能优化",
+      "capability_family": "repeat-receipt",
+      "subject": "repeat-receipt",
+      "state": "signature",
+      "invariant": "签名成立不能代表证书受信",
+      "observable": "错误签名与缺失引用拒绝",
+      "primary_mechanism": "idempotency",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/repository/store.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/repository/store.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "Import",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ]
+    },
+    {
+      "id": "crl-order",
+      "task_type": "功能优化",
+      "capability_family": "crl-order",
+      "subject": "crl-order",
+      "state": "revocation",
+      "invariant": "接收时间不等于撤销事实生效时间",
+      "observable": "错误签发者和回退序号拒绝",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ]
+    },
+    {
+      "id": "evidence-closure",
+      "task_type": "功能优化",
+      "capability_family": "evidence-closure",
+      "subject": "evidence-closure",
+      "state": "bundle",
+      "invariant": "内部自洽不证明接收方认可信任来源",
+      "observable": "拒绝内容损坏及不能复现的决定",
+      "primary_mechanism": "export_freeze",
+      "source_anchors": [
+        "internal/verification/material.go",
+        "internal/chain/build.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/material.go",
+          "internal/chain/build.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Capture",
+          "Build",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ]
+    },
+    {
+      "id": "revocation-detail",
+      "task_type": "功能优化",
+      "capability_family": "revocation-detail",
+      "subject": "revocation-detail",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Check",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "policy-selection",
+      "task_type": "功能优化",
+      "capability_family": "policy-selection",
+      "subject": "policy-selection",
+      "state": "policy",
+      "invariant": "当前策略变动与历史判断隔离",
+      "observable": "非法算法与版本冲突拒绝",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/material.go",
+        "internal/verification/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/material.go",
+          "internal/verification/service.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Capture",
+          "Verify"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ]
+    },
+    {
+      "id": "subject-matching",
+      "task_type": "功能优化",
+      "capability_family": "subject-matching",
+      "subject": "subject-matching",
+      "state": "policy",
+      "invariant": "当前策略变动与历史判断隔离",
+      "observable": "非法算法与版本冲突拒绝",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/policy/assess.go",
+        "internal/codec/certificates.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/assess.go",
+          "internal/codec/certificates.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Assess",
+          "Digest",
+          "ParseCertificate",
+          "ParseCRL",
+          "DecodeCertificates",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ]
+    },
+    {
+      "id": "large-artifacts",
+      "task_type": "功能优化",
+      "capability_family": "large-artifacts",
+      "subject": "large-artifacts",
+      "state": "artifact",
+      "invariant": "重复内容去重与内容来源解释不同",
+      "observable": "内容不符或容量不足时拒绝",
+      "primary_mechanism": "resource_lifecycle",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/verify.go",
+        "internal/verification/material.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/verify.go",
+          "internal/verification/material.go"
+        ],
+        "functions": [
+          "Import",
+          "Verify",
+          "Capture"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ]
+    },
+    {
+      "id": "cancellable-verify",
+      "task_type": "功能优化",
+      "capability_family": "cancellable-verify",
+      "subject": "cancellable-verify",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "concurrency",
+      "source_anchors": [
+        "internal/transport/decisions.go",
+        "internal/verification/service.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/transport/decisions.go",
+          "internal/verification/service.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "verify",
+          "listDecisions",
+          "getDecision",
+          "exportBundle",
+          "replay",
+          "compare",
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "crl-selection",
+      "task_type": "功能优化",
+      "capability_family": "crl-selection",
+      "subject": "crl-selection",
+      "state": "revocation",
+      "invariant": "接收时间不等于撤销事实生效时间",
+      "observable": "错误签发者和回退序号拒绝",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Check",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ]
+    },
+    {
+      "id": "stable-decisions",
+      "task_type": "功能优化",
+      "capability_family": "stable-decisions",
+      "subject": "stable-decisions",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/verification/material.go",
+        "internal/verification/evaluate.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/material.go",
+          "internal/verification/evaluate.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Capture",
+          "Evaluate",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "policy-cas",
+      "task_type": "功能优化",
+      "capability_family": "policy-cas",
+      "subject": "policy-cas",
+      "state": "policy",
+      "invariant": "当前策略变动与历史判断隔离",
+      "observable": "非法算法与版本冲突拒绝",
+      "primary_mechanism": "concurrency",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/repository/store.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/repository/store.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ]
+    },
+    {
+      "id": "compare-semantics",
+      "task_type": "功能优化",
+      "capability_family": "compare-semantics",
+      "subject": "compare-semantics",
+      "state": "compare",
+      "invariant": "最终结论相同不代表判断依据相同",
+      "observable": "拒绝不存在的决定",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ]
+    },
+    {
+      "id": "certificate-references",
+      "task_type": "功能优化",
+      "capability_family": "certificate-references",
+      "subject": "certificate-references",
+      "state": "certificates",
+      "invariant": "证书内容身份与接收表示不同",
+      "observable": "拒绝破损或多证书混合材料",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/verification/material.go",
+        "internal/transport/queries.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/verification/material.go",
+          "internal/transport/queries.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Capture",
+          "health",
+          "listCertificates",
+          "getCertificate",
+          "listTrust",
+          "getArtifact",
+          "getSignature",
+          "listCRLs",
+          "getPolicies",
+          "events"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ]
+    },
+    {
+      "id": "unknown-explanation",
+      "task_type": "功能优化",
+      "capability_family": "unknown-explanation",
+      "subject": "unknown-explanation",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go",
+        "internal/transport/decisions.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go",
+          "internal/transport/decisions.go"
+        ],
+        "functions": [
+          "Evaluate",
+          "Assess",
+          "verify",
+          "listDecisions",
+          "getDecision",
+          "exportBundle",
+          "replay",
+          "compare"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "crl-capacity",
+      "task_type": "功能优化",
+      "capability_family": "crl-capacity",
+      "subject": "crl-capacity",
+      "state": "revocation",
+      "invariant": "接收时间不等于撤销事实生效时间",
+      "observable": "错误签发者和回退序号拒绝",
+      "primary_mechanism": "capacity",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/verification/material.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/verification/material.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Import",
+          "Capture",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ]
+    },
+    {
+      "id": "retirement-meaning",
+      "task_type": "功能优化",
+      "capability_family": "retirement-meaning",
+      "subject": "retirement-meaning",
+      "state": "retire",
+      "invariant": "停止新信任不能抹掉旧依据",
+      "observable": "过期修订和重复退役拒绝",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "retire"
+      ]
+    },
+    {
+      "id": "request-resume",
+      "task_type": "功能优化",
+      "capability_family": "request-resume",
+      "subject": "request-resume",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "recovery_rollback",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/repository/store.go",
+        "internal/transport/decisions.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/repository/store.go",
+          "internal/transport/decisions.go"
+        ],
+        "functions": [
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "verify",
+          "listDecisions",
+          "getDecision",
+          "exportBundle",
+          "replay",
+          "compare"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "verification-boundaries",
+      "task_type": "代码重构",
+      "capability_family": "verification-boundaries",
+      "subject": "verification-boundaries",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/verification/evaluate.go",
+        "internal/revocation/check.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/evaluate.go",
+          "internal/revocation/check.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Evaluate",
+          "Check",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "repository-boundary",
+      "task_type": "代码重构",
+      "capability_family": "repository-boundary",
+      "subject": "repository-boundary",
+      "state": "restart",
+      "invariant": "单进程原子写入与故障恢复",
+      "observable": "损坏或不兼容状态拒绝启动",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ]
+    },
+    {
+      "id": "sqlite",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "sqlite",
+      "subject": "sqlite",
+      "state": "restart",
+      "invariant": "单进程原子写入与故障恢复",
+      "observable": "损坏或不兼容状态拒绝启动",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/repository/integrity.go",
+        "internal/verification/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/repository/integrity.go",
+          "internal/verification/service.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "ValidateState",
+          "Verify"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ]
+    },
+    {
+      "id": "evidence-format",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "evidence-format",
+      "subject": "evidence-format",
+      "state": "bundle",
+      "invariant": "内部自洽不证明接收方认可信任来源",
+      "observable": "拒绝内容损坏及不能复现的决定",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/model/types.go",
+        "internal/codec/json.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/model/types.go",
+          "internal/codec/json.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "JSONDigest",
+          "DecodeStrict",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ]
+    },
+    {
+      "id": "adversarial-evidence",
+      "task_type": "质量保障",
+      "capability_family": "adversarial-evidence",
+      "subject": "adversarial-evidence",
+      "state": "bundle",
+      "invariant": "内部自洽不证明接收方认可信任来源",
+      "observable": "拒绝内容损坏及不能复现的决定",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/codec/certificates.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/codec/certificates.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Digest",
+          "ParseCertificate",
+          "ParseCRL",
+          "DecodeCertificates"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ]
+    },
+    {
+      "id": "crypto-compatibility",
+      "task_type": "质量保障",
+      "capability_family": "crypto-compatibility",
+      "subject": "crypto-compatibility",
+      "state": "signature",
+      "invariant": "签名成立不能代表证书受信",
+      "observable": "错误签名与缺失引用拒绝",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/signature/verify.go",
+        "internal/chain/build.go",
+        "internal/revocation/check.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/verify.go",
+          "internal/chain/build.go",
+          "internal/revocation/check.go"
+        ],
+        "functions": [
+          "Verify",
+          "Build",
+          "Check"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ]
+    },
+    {
+      "id": "integration-guide",
+      "task_type": "项目维护",
+      "capability_family": "integration-guide",
+      "subject": "integration-guide",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/transport/inputs.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/transport/inputs.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "operations-handbook",
+      "task_type": "项目维护",
+      "capability_family": "operations-handbook",
+      "subject": "operations-handbook",
+      "state": "restart",
+      "invariant": "单进程原子写入与故障恢复",
+      "observable": "损坏或不兼容状态拒绝启动",
+      "primary_mechanism": "recovery_rollback",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/repository/integrity.go",
+        "cmd/sealpath/main.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/repository/integrity.go",
+          "cmd/sealpath/main.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "ValidateState",
+          "main"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ]
+    },
+    {
+      "id": "revocation-time-model",
+      "task_type": "技术讨论",
+      "capability_family": "revocation-time-model",
+      "subject": "revocation-time-model",
+      "state": "revocation",
+      "invariant": "接收时间不等于撤销事实生效时间",
+      "observable": "错误签发者和回退序号拒绝",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Check",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ]
+    },
+    {
+      "id": "proof-origin-model",
+      "task_type": "技术讨论",
+      "capability_family": "proof-origin-model",
+      "subject": "proof-origin-model",
+      "state": "bundle",
+      "invariant": "内部自洽不证明接收方认可信任来源",
+      "observable": "拒绝内容损坏及不能复现的决定",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/authority/trust.go",
+        "internal/signature/verify.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/authority/trust.go",
+          "internal/signature/verify.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "PutTrust",
+          "Retire",
+          "Verify"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ]
+    },
+    {
+      "id": "unknown-diagnosis",
+      "task_type": "问题排查与诊断",
+      "capability_family": "unknown-diagnosis",
+      "subject": "unknown-diagnosis",
+      "state": "unknown",
+      "invariant": "不确定与密码学失败属于不同事实",
+      "observable": "不会把缺证据误写成未撤销",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Check",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "unknown"
+      ]
+    },
+    {
+      "id": "changed-decision",
+      "task_type": "问题排查与诊断",
+      "capability_family": "changed-decision",
+      "subject": "changed-decision",
+      "state": "compare",
+      "invariant": "最终结论相同不代表判断依据相同",
+      "observable": "拒绝不存在的决定",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/revocation/import.go",
+        "internal/verification/material.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/revocation/import.go",
+          "internal/verification/material.go"
+        ],
+        "functions": [
+          "Compare",
+          "Import",
+          "Capture"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ]
+    },
+    {
+      "id": "container-state",
+      "task_type": "部署运维",
+      "capability_family": "container-state",
+      "subject": "container-state",
+      "state": "restart",
+      "invariant": "单进程原子写入与故障恢复",
+      "observable": "损坏或不兼容状态拒绝启动",
+      "primary_mechanism": "resource_lifecycle",
+      "source_anchors": [
+        "deploy/Dockerfile",
+        "cmd/sealpath/main.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "deploy/Dockerfile",
+          "cmd/sealpath/main.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "main",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ]
+    },
+    {
+      "id": "deployment-cutover",
+      "task_type": "部署运维",
+      "capability_family": "deployment-cutover",
+      "subject": "deployment-cutover",
+      "state": "restart",
+      "invariant": "单进程原子写入与故障恢复",
+      "observable": "损坏或不兼容状态拒绝启动",
+      "primary_mechanism": "recovery_rollback",
+      "source_anchors": [
+        "cmd/sealpath/main.go",
+        "internal/repository/store.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "cmd/sealpath/main.go",
+          "internal/repository/store.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "main",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ]
+    },
+    {
+      "id": "issuer-corpus",
+      "task_type": "泛Agent需求",
+      "capability_family": "issuer-corpus",
+      "subject": "issuer-corpus",
+      "state": "certificates",
+      "invariant": "证书内容身份与接收表示不同",
+      "observable": "拒绝破损或多证书混合材料",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/codec/certificates.go",
+        "internal/chain/build.go",
+        "cmd/sample/material.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/codec/certificates.go",
+          "internal/chain/build.go",
+          "cmd/sample/material.go"
+        ],
+        "functions": [
+          "Digest",
+          "ParseCertificate",
+          "ParseCRL",
+          "DecodeCertificates",
+          "Build",
+          "generate",
+          "sampleSigner"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ]
+    },
+    {
+      "id": "crl-calendar",
+      "task_type": "泛Agent需求",
+      "capability_family": "crl-calendar",
+      "subject": "crl-calendar",
+      "state": "revocation",
+      "invariant": "接收时间不等于撤销事实生效时间",
+      "observable": "错误签发者和回退序号拒绝",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/codec/certificates.go",
+        "internal/revocation/check.go",
+        "cmd/sample/material.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/codec/certificates.go",
+          "internal/revocation/check.go",
+          "cmd/sample/material.go"
+        ],
+        "functions": [
+          "Digest",
+          "ParseCertificate",
+          "ParseCRL",
+          "DecodeCertificates",
+          "Check",
+          "generate",
+          "sampleSigner"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ]
+    },
+    {
+      "id": "release-handoff",
+      "task_type": "泛Agent需求",
+      "capability_family": "release-handoff",
+      "subject": "release-handoff",
+      "state": "artifact",
+      "invariant": "重复内容去重与内容来源解释不同",
+      "observable": "内容不符或容量不足时拒绝",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ]
+    },
+    {
+      "id": "identity-aliases",
+      "task_type": "泛Agent需求",
+      "capability_family": "identity-aliases",
+      "subject": "identity-aliases",
+      "state": "certificates",
+      "invariant": "证书内容身份与接收表示不同",
+      "observable": "拒绝破损或多证书混合材料",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/codec/certificates.go",
+        "internal/policy/assess.go",
+        "internal/authority/certificates.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/codec/certificates.go",
+          "internal/policy/assess.go",
+          "internal/authority/certificates.go"
+        ],
+        "functions": [
+          "Digest",
+          "ParseCertificate",
+          "ParseCRL",
+          "DecodeCertificates",
+          "Assess",
+          "ImportCertificate"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ]
+    },
+    {
+      "id": "revoked-impact-packet",
+      "task_type": "泛Agent需求",
+      "capability_family": "revoked-impact-packet",
+      "subject": "revoked-impact-packet",
+      "state": "compare",
+      "invariant": "最终结论相同不代表判断依据相同",
+      "observable": "拒绝不存在的决定",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/revocation/check.go",
+        "internal/verification/material.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/revocation/check.go",
+          "internal/verification/material.go"
+        ],
+        "functions": [
+          "Compare",
+          "Check",
+          "Capture"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ]
+    },
+    {
+      "id": "evidence-catalog",
+      "task_type": "泛Agent需求",
+      "capability_family": "evidence-catalog",
+      "subject": "evidence-catalog",
+      "state": "bundle",
+      "invariant": "内部自洽不证明接收方认可信任来源",
+      "observable": "拒绝内容损坏及不能复现的决定",
+      "primary_mechanism": "export_freeze",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/codec/json.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/codec/json.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "JSONDigest",
+          "DecodeStrict"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ]
+    },
+    {
+      "id": "policy-recipient-brief",
+      "task_type": "泛Agent需求",
+      "capability_family": "policy-recipient-brief",
+      "subject": "policy-recipient-brief",
+      "state": "policy",
+      "invariant": "当前策略变动与历史判断隔离",
+      "observable": "非法算法与版本冲突拒绝",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ]
+    },
+    {
+      "id": "evidence-redaction",
+      "task_type": "泛Agent需求",
+      "capability_family": "evidence-redaction",
+      "subject": "evidence-redaction",
+      "state": "bundle",
+      "invariant": "内部自洽不证明接收方认可信任来源",
+      "observable": "拒绝内容损坏及不能复现的决定",
+      "primary_mechanism": "resource_lifecycle",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/material.go",
+        "internal/chain/build.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/material.go",
+          "internal/chain/build.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Capture",
+          "Build"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ]
+    },
+    {
+      "id": "clock-evidence-note",
+      "task_type": "泛Agent需求",
+      "capability_family": "clock-evidence-note",
+      "subject": "clock-evidence-note",
+      "state": "verify",
+      "invariant": "安全要求与证据不足下的可用性",
+      "observable": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/verification/evaluate.go",
+        "internal/revocation/check.go",
+        "cmd/sample/material.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/evaluate.go",
+          "internal/revocation/check.go",
+          "cmd/sample/material.go"
+        ],
+        "functions": [
+          "Evaluate",
+          "Check",
+          "generate",
+          "sampleSigner"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "signer-portfolio",
+      "task_type": "泛Agent需求",
+      "capability_family": "signer-portfolio",
+      "subject": "signer-portfolio",
+      "state": "signature",
+      "invariant": "签名成立不能代表证书受信",
+      "observable": "错误签名与缺失引用拒绝",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/verify.go",
+        "internal/chain/build.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/verify.go",
+          "internal/chain/build.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Verify",
+          "Build",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ]
+    },
+    {
+      "id": "secure-time-source",
+      "task_type": "功能开发",
+      "capability_family": "secure-time-source",
+      "subject": "以可验证时间来源替代接收方自报时刻",
+      "state": "verify",
+      "invariant": "以可验证时间来源替代接收方自报时刻时保留签名事实及原证据关系",
+      "observable": "以可验证时间来源替代接收方自报时刻的可核查结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "extension_seam_id": "secure-time-source"
+    },
+    {
+      "id": "trusted-material-replication",
+      "task_type": "功能开发",
+      "capability_family": "trusted-material-replication",
+      "subject": "在不同接收方之间传递经认可的证据材料",
+      "state": "restart",
+      "invariant": "在不同接收方之间传递经认可的证据材料时保留签名事实及原证据关系",
+      "observable": "在不同接收方之间传递经认可的证据材料的可核查结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "extension_seam_id": "trusted-material-replication"
+    },
+    {
+      "id": "signed-policy-distribution",
+      "task_type": "功能开发",
+      "capability_family": "signed-policy-distribution",
+      "subject": "核验策略发行者签名与接收方认可范围",
+      "state": "policy",
+      "invariant": "核验策略发行者签名与接收方认可范围时保留签名事实及原证据关系",
+      "observable": "核验策略发行者签名与接收方认可范围的可核查结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "extension_seam_id": "signed-policy-distribution"
+    },
+    {
+      "id": "external-root-restrictions",
+      "task_type": "功能开发",
+      "capability_family": "external-root-restrictions",
+      "subject": "把接收方独立的根约束与材料链绑定",
+      "state": "trust",
+      "invariant": "把接收方独立的根约束与材料链绑定时保留签名事实及原证据关系",
+      "observable": "把接收方独立的根约束与材料链绑定的可核查结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "extension_seam_id": "external-root-restrictions"
+    },
+    {
+      "id": "evidence-search",
+      "task_type": "功能开发",
+      "capability_family": "evidence-search",
+      "subject": "按被影响的证据关系查找历史决定",
+      "state": "compare",
+      "invariant": "按被影响的证据关系查找历史决定时保留签名事实及原证据关系",
+      "observable": "按被影响的证据关系查找历史决定的可核查结果",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "extension_seam_id": "evidence-search"
+    },
+    {
+      "id": "bounded-cert-decoding",
+      "task_type": "功能优化",
+      "capability_family": "bounded-cert-decoding",
+      "subject": "限制重复证书解析占用并保留错误来源",
+      "state": "certificates",
+      "invariant": "限制重复证书解析占用并保留错误来源时保留签名事实及原证据关系",
+      "observable": "限制重复证书解析占用并保留错误来源的可核查结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ]
+    },
+    {
+      "id": "signature-provenance",
+      "task_type": "功能优化",
+      "capability_family": "signature-provenance",
+      "subject": "区分分离签名内容身份与接收来源",
+      "state": "signature",
+      "invariant": "区分分离签名内容身份与接收来源时保留签名事实及原证据关系",
+      "observable": "区分分离签名内容身份与接收来源的可核查结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ]
+    },
+    {
+      "id": "crl-issuer-disambiguation",
+      "task_type": "功能优化",
+      "capability_family": "crl-issuer-disambiguation",
+      "subject": "同名签发者的CRL引用消歧",
+      "state": "revocation",
+      "invariant": "同名签发者的CRL引用消歧时保留签名事实及原证据关系",
+      "observable": "同名签发者的CRL引用消歧的可核查结果",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ]
+    },
+    {
+      "id": "chain-explanation",
+      "task_type": "功能优化",
+      "capability_family": "chain-explanation",
+      "subject": "让证书路径失败信息保留可用推理依据",
+      "state": "verify",
+      "invariant": "让证书路径失败信息保留可用推理依据时保留签名事实及原证据关系",
+      "observable": "让证书路径失败信息保留可用推理依据的可核查结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ]
+    },
+    {
+      "id": "restore-verification",
+      "task_type": "功能优化",
+      "capability_family": "restore-verification",
+      "subject": "恢复时核对证据内容与派生元数据的关系",
+      "state": "restart",
+      "invariant": "恢复时核对证据内容与派生元数据的关系时保留签名事实及原证据关系",
+      "observable": "恢复时核对证据内容与派生元数据的关系的可核查结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ]
+    },
+    {
+      "id": "代码重构-reserve-3",
+      "task_type": "代码重构",
+      "capability_family": "证书DER身份与接收来源",
+      "subject": "证书DER身份与接收来源",
+      "state": "certificates",
+      "invariant": "证书DER身份与接收来源不被错误等同",
+      "observable": "代码重构针对证书DER身份与接收来源的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-4",
+      "task_type": "代码重构",
+      "capability_family": "自签CA事实与接收方信任认可",
+      "subject": "自签CA事实与接收方信任认可",
+      "state": "trust",
+      "invariant": "自签CA事实与接收方信任认可不被错误等同",
+      "observable": "代码重构针对自签CA事实与接收方信任认可的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-5",
+      "task_type": "代码重构",
+      "capability_family": "内容摘要与声明摘要一致性",
+      "subject": "内容摘要与声明摘要一致性",
+      "state": "artifact",
+      "invariant": "内容摘要与声明摘要一致性不被错误等同",
+      "observable": "代码重构针对内容摘要与声明摘要一致性的独立结果",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-6",
+      "task_type": "代码重构",
+      "capability_family": "制品签名与证书签发的区别",
+      "subject": "制品签名与证书签发的区别",
+      "state": "signature",
+      "invariant": "制品签名与证书签发的区别不被错误等同",
+      "observable": "代码重构针对制品签名与证书签发的区别的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-7",
+      "task_type": "代码重构",
+      "capability_family": "策略版本与默认规则选择",
+      "subject": "策略版本与默认规则选择",
+      "state": "policy",
+      "invariant": "策略版本与默认规则选择不被错误等同",
+      "observable": "代码重构针对策略版本与默认规则选择的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-8",
+      "task_type": "代码重构",
+      "capability_family": "CRL序号与签发时间关系",
+      "subject": "CRL序号与签发时间关系",
+      "state": "revocation",
+      "invariant": "CRL序号与签发时间关系不被错误等同",
+      "observable": "代码重构针对CRL序号与签发时间关系的独立结果",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-9",
+      "task_type": "代码重构",
+      "capability_family": "路径用途与制品认可",
+      "subject": "路径用途与制品认可",
+      "state": "verify",
+      "invariant": "路径用途与制品认可不被错误等同",
+      "observable": "代码重构针对路径用途与制品认可的独立结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-10",
+      "task_type": "代码重构",
+      "capability_family": "撤销资料缺失与明确撤销区别",
+      "subject": "撤销资料缺失与明确撤销区别",
+      "state": "unknown",
+      "invariant": "撤销资料缺失与明确撤销区别不被错误等同",
+      "observable": "代码重构针对撤销资料缺失与明确撤销区别的独立结果",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Check",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "unknown"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-11",
+      "task_type": "代码重构",
+      "capability_family": "历史规则与当前配置关系",
+      "subject": "历史规则与当前配置关系",
+      "state": "history",
+      "invariant": "历史规则与当前配置关系不被错误等同",
+      "observable": "代码重构针对历史规则与当前配置关系的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "history"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-12",
+      "task_type": "代码重构",
+      "capability_family": "包内自洽与信任来源区别",
+      "subject": "包内自洽与信任来源区别",
+      "state": "bundle",
+      "invariant": "包内自洽与信任来源区别不被错误等同",
+      "observable": "代码重构针对包内自洽与信任来源区别的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/service.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Create",
+          "Select"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-13",
+      "task_type": "代码重构",
+      "capability_family": "结论变化与证据变化关系",
+      "subject": "结论变化与证据变化关系",
+      "state": "compare",
+      "invariant": "结论变化与证据变化关系不被错误等同",
+      "observable": "代码重构针对结论变化与证据变化关系的独立结果",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-14",
+      "task_type": "代码重构",
+      "capability_family": "原子保存与重启引用恢复",
+      "subject": "原子保存与重启引用恢复",
+      "state": "restart",
+      "invariant": "原子保存与重启引用恢复不被错误等同",
+      "observable": "代码重构针对原子保存与重启引用恢复的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "代码重构-reserve-15",
+      "task_type": "代码重构",
+      "capability_family": "停止认可与历史复核关系",
+      "subject": "停止认可与历史复核关系",
+      "state": "retire",
+      "invariant": "停止认可与历史复核关系不被错误等同",
+      "observable": "代码重构针对停止认可与历史复核关系的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "retire"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-3",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "证书DER身份与接收来源",
+      "subject": "证书DER身份与接收来源",
+      "state": "certificates",
+      "invariant": "证书DER身份与接收来源不被错误等同",
+      "observable": "依赖升级与迁移针对证书DER身份与接收来源的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-4",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "自签CA事实与接收方信任认可",
+      "subject": "自签CA事实与接收方信任认可",
+      "state": "trust",
+      "invariant": "自签CA事实与接收方信任认可不被错误等同",
+      "observable": "依赖升级与迁移针对自签CA事实与接收方信任认可的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-5",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "内容摘要与声明摘要一致性",
+      "subject": "内容摘要与声明摘要一致性",
+      "state": "artifact",
+      "invariant": "内容摘要与声明摘要一致性不被错误等同",
+      "observable": "依赖升级与迁移针对内容摘要与声明摘要一致性的独立结果",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-6",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "制品签名与证书签发的区别",
+      "subject": "制品签名与证书签发的区别",
+      "state": "signature",
+      "invariant": "制品签名与证书签发的区别不被错误等同",
+      "observable": "依赖升级与迁移针对制品签名与证书签发的区别的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-7",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "策略版本与默认规则选择",
+      "subject": "策略版本与默认规则选择",
+      "state": "policy",
+      "invariant": "策略版本与默认规则选择不被错误等同",
+      "observable": "依赖升级与迁移针对策略版本与默认规则选择的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-8",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "CRL序号与签发时间关系",
+      "subject": "CRL序号与签发时间关系",
+      "state": "revocation",
+      "invariant": "CRL序号与签发时间关系不被错误等同",
+      "observable": "依赖升级与迁移针对CRL序号与签发时间关系的独立结果",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-9",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "路径用途与制品认可",
+      "subject": "路径用途与制品认可",
+      "state": "verify",
+      "invariant": "路径用途与制品认可不被错误等同",
+      "observable": "依赖升级与迁移针对路径用途与制品认可的独立结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-10",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "撤销资料缺失与明确撤销区别",
+      "subject": "撤销资料缺失与明确撤销区别",
+      "state": "unknown",
+      "invariant": "撤销资料缺失与明确撤销区别不被错误等同",
+      "observable": "依赖升级与迁移针对撤销资料缺失与明确撤销区别的独立结果",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Check",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "unknown"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-11",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "历史规则与当前配置关系",
+      "subject": "历史规则与当前配置关系",
+      "state": "history",
+      "invariant": "历史规则与当前配置关系不被错误等同",
+      "observable": "依赖升级与迁移针对历史规则与当前配置关系的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "history"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-12",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "包内自洽与信任来源区别",
+      "subject": "包内自洽与信任来源区别",
+      "state": "bundle",
+      "invariant": "包内自洽与信任来源区别不被错误等同",
+      "observable": "依赖升级与迁移针对包内自洽与信任来源区别的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/service.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Create",
+          "Select"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-13",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "结论变化与证据变化关系",
+      "subject": "结论变化与证据变化关系",
+      "state": "compare",
+      "invariant": "结论变化与证据变化关系不被错误等同",
+      "observable": "依赖升级与迁移针对结论变化与证据变化关系的独立结果",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-14",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "原子保存与重启引用恢复",
+      "subject": "原子保存与重启引用恢复",
+      "state": "restart",
+      "invariant": "原子保存与重启引用恢复不被错误等同",
+      "observable": "依赖升级与迁移针对原子保存与重启引用恢复的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "依赖升级与迁移-reserve-15",
+      "task_type": "依赖升级与迁移",
+      "capability_family": "停止认可与历史复核关系",
+      "subject": "停止认可与历史复核关系",
+      "state": "retire",
+      "invariant": "停止认可与历史复核关系不被错误等同",
+      "observable": "依赖升级与迁移针对停止认可与历史复核关系的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "retire"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-3",
+      "task_type": "质量保障",
+      "capability_family": "证书DER身份与接收来源",
+      "subject": "证书DER身份与接收来源",
+      "state": "certificates",
+      "invariant": "证书DER身份与接收来源不被错误等同",
+      "observable": "质量保障针对证书DER身份与接收来源的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-4",
+      "task_type": "质量保障",
+      "capability_family": "自签CA事实与接收方信任认可",
+      "subject": "自签CA事实与接收方信任认可",
+      "state": "trust",
+      "invariant": "自签CA事实与接收方信任认可不被错误等同",
+      "observable": "质量保障针对自签CA事实与接收方信任认可的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-5",
+      "task_type": "质量保障",
+      "capability_family": "内容摘要与声明摘要一致性",
+      "subject": "内容摘要与声明摘要一致性",
+      "state": "artifact",
+      "invariant": "内容摘要与声明摘要一致性不被错误等同",
+      "observable": "质量保障针对内容摘要与声明摘要一致性的独立结果",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-6",
+      "task_type": "质量保障",
+      "capability_family": "制品签名与证书签发的区别",
+      "subject": "制品签名与证书签发的区别",
+      "state": "signature",
+      "invariant": "制品签名与证书签发的区别不被错误等同",
+      "observable": "质量保障针对制品签名与证书签发的区别的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-7",
+      "task_type": "质量保障",
+      "capability_family": "策略版本与默认规则选择",
+      "subject": "策略版本与默认规则选择",
+      "state": "policy",
+      "invariant": "策略版本与默认规则选择不被错误等同",
+      "observable": "质量保障针对策略版本与默认规则选择的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-8",
+      "task_type": "质量保障",
+      "capability_family": "CRL序号与签发时间关系",
+      "subject": "CRL序号与签发时间关系",
+      "state": "revocation",
+      "invariant": "CRL序号与签发时间关系不被错误等同",
+      "observable": "质量保障针对CRL序号与签发时间关系的独立结果",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-9",
+      "task_type": "质量保障",
+      "capability_family": "路径用途与制品认可",
+      "subject": "路径用途与制品认可",
+      "state": "verify",
+      "invariant": "路径用途与制品认可不被错误等同",
+      "observable": "质量保障针对路径用途与制品认可的独立结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-10",
+      "task_type": "质量保障",
+      "capability_family": "撤销资料缺失与明确撤销区别",
+      "subject": "撤销资料缺失与明确撤销区别",
+      "state": "unknown",
+      "invariant": "撤销资料缺失与明确撤销区别不被错误等同",
+      "observable": "质量保障针对撤销资料缺失与明确撤销区别的独立结果",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Check",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "unknown"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-11",
+      "task_type": "质量保障",
+      "capability_family": "历史规则与当前配置关系",
+      "subject": "历史规则与当前配置关系",
+      "state": "history",
+      "invariant": "历史规则与当前配置关系不被错误等同",
+      "observable": "质量保障针对历史规则与当前配置关系的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "history"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-12",
+      "task_type": "质量保障",
+      "capability_family": "包内自洽与信任来源区别",
+      "subject": "包内自洽与信任来源区别",
+      "state": "bundle",
+      "invariant": "包内自洽与信任来源区别不被错误等同",
+      "observable": "质量保障针对包内自洽与信任来源区别的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/service.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Create",
+          "Select"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-13",
+      "task_type": "质量保障",
+      "capability_family": "结论变化与证据变化关系",
+      "subject": "结论变化与证据变化关系",
+      "state": "compare",
+      "invariant": "结论变化与证据变化关系不被错误等同",
+      "observable": "质量保障针对结论变化与证据变化关系的独立结果",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-14",
+      "task_type": "质量保障",
+      "capability_family": "原子保存与重启引用恢复",
+      "subject": "原子保存与重启引用恢复",
+      "state": "restart",
+      "invariant": "原子保存与重启引用恢复不被错误等同",
+      "observable": "质量保障针对原子保存与重启引用恢复的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "质量保障-reserve-15",
+      "task_type": "质量保障",
+      "capability_family": "停止认可与历史复核关系",
+      "subject": "停止认可与历史复核关系",
+      "state": "retire",
+      "invariant": "停止认可与历史复核关系不被错误等同",
+      "observable": "质量保障针对停止认可与历史复核关系的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "retire"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-3",
+      "task_type": "项目维护",
+      "capability_family": "证书DER身份与接收来源",
+      "subject": "证书DER身份与接收来源",
+      "state": "certificates",
+      "invariant": "证书DER身份与接收来源不被错误等同",
+      "observable": "项目维护针对证书DER身份与接收来源的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-4",
+      "task_type": "项目维护",
+      "capability_family": "自签CA事实与接收方信任认可",
+      "subject": "自签CA事实与接收方信任认可",
+      "state": "trust",
+      "invariant": "自签CA事实与接收方信任认可不被错误等同",
+      "observable": "项目维护针对自签CA事实与接收方信任认可的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-5",
+      "task_type": "项目维护",
+      "capability_family": "内容摘要与声明摘要一致性",
+      "subject": "内容摘要与声明摘要一致性",
+      "state": "artifact",
+      "invariant": "内容摘要与声明摘要一致性不被错误等同",
+      "observable": "项目维护针对内容摘要与声明摘要一致性的独立结果",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-6",
+      "task_type": "项目维护",
+      "capability_family": "制品签名与证书签发的区别",
+      "subject": "制品签名与证书签发的区别",
+      "state": "signature",
+      "invariant": "制品签名与证书签发的区别不被错误等同",
+      "observable": "项目维护针对制品签名与证书签发的区别的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-7",
+      "task_type": "项目维护",
+      "capability_family": "策略版本与默认规则选择",
+      "subject": "策略版本与默认规则选择",
+      "state": "policy",
+      "invariant": "策略版本与默认规则选择不被错误等同",
+      "observable": "项目维护针对策略版本与默认规则选择的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-8",
+      "task_type": "项目维护",
+      "capability_family": "CRL序号与签发时间关系",
+      "subject": "CRL序号与签发时间关系",
+      "state": "revocation",
+      "invariant": "CRL序号与签发时间关系不被错误等同",
+      "observable": "项目维护针对CRL序号与签发时间关系的独立结果",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-9",
+      "task_type": "项目维护",
+      "capability_family": "路径用途与制品认可",
+      "subject": "路径用途与制品认可",
+      "state": "verify",
+      "invariant": "路径用途与制品认可不被错误等同",
+      "observable": "项目维护针对路径用途与制品认可的独立结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-10",
+      "task_type": "项目维护",
+      "capability_family": "撤销资料缺失与明确撤销区别",
+      "subject": "撤销资料缺失与明确撤销区别",
+      "state": "unknown",
+      "invariant": "撤销资料缺失与明确撤销区别不被错误等同",
+      "observable": "项目维护针对撤销资料缺失与明确撤销区别的独立结果",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Check",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "unknown"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-11",
+      "task_type": "项目维护",
+      "capability_family": "历史规则与当前配置关系",
+      "subject": "历史规则与当前配置关系",
+      "state": "history",
+      "invariant": "历史规则与当前配置关系不被错误等同",
+      "observable": "项目维护针对历史规则与当前配置关系的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "history"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-12",
+      "task_type": "项目维护",
+      "capability_family": "包内自洽与信任来源区别",
+      "subject": "包内自洽与信任来源区别",
+      "state": "bundle",
+      "invariant": "包内自洽与信任来源区别不被错误等同",
+      "observable": "项目维护针对包内自洽与信任来源区别的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/service.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Create",
+          "Select"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-13",
+      "task_type": "项目维护",
+      "capability_family": "结论变化与证据变化关系",
+      "subject": "结论变化与证据变化关系",
+      "state": "compare",
+      "invariant": "结论变化与证据变化关系不被错误等同",
+      "observable": "项目维护针对结论变化与证据变化关系的独立结果",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-14",
+      "task_type": "项目维护",
+      "capability_family": "原子保存与重启引用恢复",
+      "subject": "原子保存与重启引用恢复",
+      "state": "restart",
+      "invariant": "原子保存与重启引用恢复不被错误等同",
+      "observable": "项目维护针对原子保存与重启引用恢复的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "项目维护-reserve-15",
+      "task_type": "项目维护",
+      "capability_family": "停止认可与历史复核关系",
+      "subject": "停止认可与历史复核关系",
+      "state": "retire",
+      "invariant": "停止认可与历史复核关系不被错误等同",
+      "observable": "项目维护针对停止认可与历史复核关系的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "retire"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-3",
+      "task_type": "技术讨论",
+      "capability_family": "证书DER身份与接收来源",
+      "subject": "证书DER身份与接收来源",
+      "state": "certificates",
+      "invariant": "证书DER身份与接收来源不被错误等同",
+      "observable": "技术讨论针对证书DER身份与接收来源的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-4",
+      "task_type": "技术讨论",
+      "capability_family": "自签CA事实与接收方信任认可",
+      "subject": "自签CA事实与接收方信任认可",
+      "state": "trust",
+      "invariant": "自签CA事实与接收方信任认可不被错误等同",
+      "observable": "技术讨论针对自签CA事实与接收方信任认可的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-5",
+      "task_type": "技术讨论",
+      "capability_family": "内容摘要与声明摘要一致性",
+      "subject": "内容摘要与声明摘要一致性",
+      "state": "artifact",
+      "invariant": "内容摘要与声明摘要一致性不被错误等同",
+      "observable": "技术讨论针对内容摘要与声明摘要一致性的独立结果",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-6",
+      "task_type": "技术讨论",
+      "capability_family": "制品签名与证书签发的区别",
+      "subject": "制品签名与证书签发的区别",
+      "state": "signature",
+      "invariant": "制品签名与证书签发的区别不被错误等同",
+      "observable": "技术讨论针对制品签名与证书签发的区别的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-7",
+      "task_type": "技术讨论",
+      "capability_family": "策略版本与默认规则选择",
+      "subject": "策略版本与默认规则选择",
+      "state": "policy",
+      "invariant": "策略版本与默认规则选择不被错误等同",
+      "observable": "技术讨论针对策略版本与默认规则选择的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-8",
+      "task_type": "技术讨论",
+      "capability_family": "CRL序号与签发时间关系",
+      "subject": "CRL序号与签发时间关系",
+      "state": "revocation",
+      "invariant": "CRL序号与签发时间关系不被错误等同",
+      "observable": "技术讨论针对CRL序号与签发时间关系的独立结果",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-9",
+      "task_type": "技术讨论",
+      "capability_family": "路径用途与制品认可",
+      "subject": "路径用途与制品认可",
+      "state": "verify",
+      "invariant": "路径用途与制品认可不被错误等同",
+      "observable": "技术讨论针对路径用途与制品认可的独立结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-10",
+      "task_type": "技术讨论",
+      "capability_family": "撤销资料缺失与明确撤销区别",
+      "subject": "撤销资料缺失与明确撤销区别",
+      "state": "unknown",
+      "invariant": "撤销资料缺失与明确撤销区别不被错误等同",
+      "observable": "技术讨论针对撤销资料缺失与明确撤销区别的独立结果",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Check",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "unknown"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-11",
+      "task_type": "技术讨论",
+      "capability_family": "历史规则与当前配置关系",
+      "subject": "历史规则与当前配置关系",
+      "state": "history",
+      "invariant": "历史规则与当前配置关系不被错误等同",
+      "observable": "技术讨论针对历史规则与当前配置关系的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "history"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-12",
+      "task_type": "技术讨论",
+      "capability_family": "包内自洽与信任来源区别",
+      "subject": "包内自洽与信任来源区别",
+      "state": "bundle",
+      "invariant": "包内自洽与信任来源区别不被错误等同",
+      "observable": "技术讨论针对包内自洽与信任来源区别的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/service.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Create",
+          "Select"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-13",
+      "task_type": "技术讨论",
+      "capability_family": "结论变化与证据变化关系",
+      "subject": "结论变化与证据变化关系",
+      "state": "compare",
+      "invariant": "结论变化与证据变化关系不被错误等同",
+      "observable": "技术讨论针对结论变化与证据变化关系的独立结果",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-14",
+      "task_type": "技术讨论",
+      "capability_family": "原子保存与重启引用恢复",
+      "subject": "原子保存与重启引用恢复",
+      "state": "restart",
+      "invariant": "原子保存与重启引用恢复不被错误等同",
+      "observable": "技术讨论针对原子保存与重启引用恢复的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "技术讨论-reserve-15",
+      "task_type": "技术讨论",
+      "capability_family": "停止认可与历史复核关系",
+      "subject": "停止认可与历史复核关系",
+      "state": "retire",
+      "invariant": "停止认可与历史复核关系不被错误等同",
+      "observable": "技术讨论针对停止认可与历史复核关系的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "retire"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-3",
+      "task_type": "问题排查与诊断",
+      "capability_family": "证书DER身份与接收来源",
+      "subject": "证书DER身份与接收来源",
+      "state": "certificates",
+      "invariant": "证书DER身份与接收来源不被错误等同",
+      "observable": "问题排查与诊断针对证书DER身份与接收来源的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-4",
+      "task_type": "问题排查与诊断",
+      "capability_family": "自签CA事实与接收方信任认可",
+      "subject": "自签CA事实与接收方信任认可",
+      "state": "trust",
+      "invariant": "自签CA事实与接收方信任认可不被错误等同",
+      "observable": "问题排查与诊断针对自签CA事实与接收方信任认可的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-5",
+      "task_type": "问题排查与诊断",
+      "capability_family": "内容摘要与声明摘要一致性",
+      "subject": "内容摘要与声明摘要一致性",
+      "state": "artifact",
+      "invariant": "内容摘要与声明摘要一致性不被错误等同",
+      "observable": "问题排查与诊断针对内容摘要与声明摘要一致性的独立结果",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-6",
+      "task_type": "问题排查与诊断",
+      "capability_family": "制品签名与证书签发的区别",
+      "subject": "制品签名与证书签发的区别",
+      "state": "signature",
+      "invariant": "制品签名与证书签发的区别不被错误等同",
+      "observable": "问题排查与诊断针对制品签名与证书签发的区别的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-7",
+      "task_type": "问题排查与诊断",
+      "capability_family": "策略版本与默认规则选择",
+      "subject": "策略版本与默认规则选择",
+      "state": "policy",
+      "invariant": "策略版本与默认规则选择不被错误等同",
+      "observable": "问题排查与诊断针对策略版本与默认规则选择的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-8",
+      "task_type": "问题排查与诊断",
+      "capability_family": "CRL序号与签发时间关系",
+      "subject": "CRL序号与签发时间关系",
+      "state": "revocation",
+      "invariant": "CRL序号与签发时间关系不被错误等同",
+      "observable": "问题排查与诊断针对CRL序号与签发时间关系的独立结果",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-9",
+      "task_type": "问题排查与诊断",
+      "capability_family": "路径用途与制品认可",
+      "subject": "路径用途与制品认可",
+      "state": "verify",
+      "invariant": "路径用途与制品认可不被错误等同",
+      "observable": "问题排查与诊断针对路径用途与制品认可的独立结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-10",
+      "task_type": "问题排查与诊断",
+      "capability_family": "撤销资料缺失与明确撤销区别",
+      "subject": "撤销资料缺失与明确撤销区别",
+      "state": "unknown",
+      "invariant": "撤销资料缺失与明确撤销区别不被错误等同",
+      "observable": "问题排查与诊断针对撤销资料缺失与明确撤销区别的独立结果",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Check",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "unknown"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-11",
+      "task_type": "问题排查与诊断",
+      "capability_family": "历史规则与当前配置关系",
+      "subject": "历史规则与当前配置关系",
+      "state": "history",
+      "invariant": "历史规则与当前配置关系不被错误等同",
+      "observable": "问题排查与诊断针对历史规则与当前配置关系的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "history"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-12",
+      "task_type": "问题排查与诊断",
+      "capability_family": "包内自洽与信任来源区别",
+      "subject": "包内自洽与信任来源区别",
+      "state": "bundle",
+      "invariant": "包内自洽与信任来源区别不被错误等同",
+      "observable": "问题排查与诊断针对包内自洽与信任来源区别的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/service.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Create",
+          "Select"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-13",
+      "task_type": "问题排查与诊断",
+      "capability_family": "结论变化与证据变化关系",
+      "subject": "结论变化与证据变化关系",
+      "state": "compare",
+      "invariant": "结论变化与证据变化关系不被错误等同",
+      "observable": "问题排查与诊断针对结论变化与证据变化关系的独立结果",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-14",
+      "task_type": "问题排查与诊断",
+      "capability_family": "原子保存与重启引用恢复",
+      "subject": "原子保存与重启引用恢复",
+      "state": "restart",
+      "invariant": "原子保存与重启引用恢复不被错误等同",
+      "observable": "问题排查与诊断针对原子保存与重启引用恢复的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "问题排查与诊断-reserve-15",
+      "task_type": "问题排查与诊断",
+      "capability_family": "停止认可与历史复核关系",
+      "subject": "停止认可与历史复核关系",
+      "state": "retire",
+      "invariant": "停止认可与历史复核关系不被错误等同",
+      "observable": "问题排查与诊断针对停止认可与历史复核关系的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "retire"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-3",
+      "task_type": "部署运维",
+      "capability_family": "证书DER身份与接收来源",
+      "subject": "证书DER身份与接收来源",
+      "state": "certificates",
+      "invariant": "证书DER身份与接收来源不被错误等同",
+      "observable": "部署运维针对证书DER身份与接收来源的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-4",
+      "task_type": "部署运维",
+      "capability_family": "自签CA事实与接收方信任认可",
+      "subject": "自签CA事实与接收方信任认可",
+      "state": "trust",
+      "invariant": "自签CA事实与接收方信任认可不被错误等同",
+      "observable": "部署运维针对自签CA事实与接收方信任认可的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-5",
+      "task_type": "部署运维",
+      "capability_family": "内容摘要与声明摘要一致性",
+      "subject": "内容摘要与声明摘要一致性",
+      "state": "artifact",
+      "invariant": "内容摘要与声明摘要一致性不被错误等同",
+      "observable": "部署运维针对内容摘要与声明摘要一致性的独立结果",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-6",
+      "task_type": "部署运维",
+      "capability_family": "制品签名与证书签发的区别",
+      "subject": "制品签名与证书签发的区别",
+      "state": "signature",
+      "invariant": "制品签名与证书签发的区别不被错误等同",
+      "observable": "部署运维针对制品签名与证书签发的区别的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-7",
+      "task_type": "部署运维",
+      "capability_family": "策略版本与默认规则选择",
+      "subject": "策略版本与默认规则选择",
+      "state": "policy",
+      "invariant": "策略版本与默认规则选择不被错误等同",
+      "observable": "部署运维针对策略版本与默认规则选择的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-8",
+      "task_type": "部署运维",
+      "capability_family": "CRL序号与签发时间关系",
+      "subject": "CRL序号与签发时间关系",
+      "state": "revocation",
+      "invariant": "CRL序号与签发时间关系不被错误等同",
+      "observable": "部署运维针对CRL序号与签发时间关系的独立结果",
+      "primary_mechanism": "time_semantics",
+      "source_anchors": [
+        "internal/revocation/import.go",
+        "internal/revocation/check.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/import.go",
+          "internal/revocation/check.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Check",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "revocation"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-9",
+      "task_type": "部署运维",
+      "capability_family": "路径用途与制品认可",
+      "subject": "路径用途与制品认可",
+      "state": "verify",
+      "invariant": "路径用途与制品认可不被错误等同",
+      "observable": "部署运维针对路径用途与制品认可的独立结果",
+      "primary_mechanism": "authorization",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "Evaluate",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "verify"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-10",
+      "task_type": "部署运维",
+      "capability_family": "撤销资料缺失与明确撤销区别",
+      "subject": "撤销资料缺失与明确撤销区别",
+      "state": "unknown",
+      "invariant": "撤销资料缺失与明确撤销区别不被错误等同",
+      "observable": "部署运维针对撤销资料缺失与明确撤销区别的独立结果",
+      "primary_mechanism": "error_propagation",
+      "source_anchors": [
+        "internal/revocation/check.go",
+        "internal/chain/build.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/revocation/check.go",
+          "internal/chain/build.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Check",
+          "Build",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "unknown"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-11",
+      "task_type": "部署运维",
+      "capability_family": "历史规则与当前配置关系",
+      "subject": "历史规则与当前配置关系",
+      "state": "history",
+      "invariant": "历史规则与当前配置关系不被错误等同",
+      "observable": "部署运维针对历史规则与当前配置关系的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/verification/service.go",
+        "internal/repository/store.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/verification/service.go",
+          "internal/repository/store.go"
+        ],
+        "functions": [
+          "Verify",
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist"
+        ]
+      },
+      "workflow_ids": [
+        "history"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-12",
+      "task_type": "部署运维",
+      "capability_family": "包内自洽与信任来源区别",
+      "subject": "包内自洽与信任来源区别",
+      "state": "bundle",
+      "invariant": "包内自洽与信任来源区别不被错误等同",
+      "observable": "部署运维针对包内自洽与信任来源区别的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/evidence/bundle.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/service.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/bundle.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/service.go"
+        ],
+        "functions": [
+          "digest",
+          "Export",
+          "Replay",
+          "Evaluate",
+          "Create",
+          "Select"
+        ]
+      },
+      "workflow_ids": [
+        "bundle"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-13",
+      "task_type": "部署运维",
+      "capability_family": "结论变化与证据变化关系",
+      "subject": "结论变化与证据变化关系",
+      "state": "compare",
+      "invariant": "结论变化与证据变化关系不被错误等同",
+      "observable": "部署运维针对结论变化与证据变化关系的独立结果",
+      "primary_mechanism": "lineage",
+      "source_anchors": [
+        "internal/evidence/compare.go",
+        "internal/verification/evaluate.go",
+        "internal/policy/assess.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/evidence/compare.go",
+          "internal/verification/evaluate.go",
+          "internal/policy/assess.go"
+        ],
+        "functions": [
+          "Compare",
+          "Evaluate",
+          "Assess"
+        ]
+      },
+      "workflow_ids": [
+        "compare"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-14",
+      "task_type": "部署运维",
+      "capability_family": "原子保存与重启引用恢复",
+      "subject": "原子保存与重启引用恢复",
+      "state": "restart",
+      "invariant": "原子保存与重启引用恢复不被错误等同",
+      "observable": "部署运维针对原子保存与重启引用恢复的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/repository/store.go",
+        "internal/verification/service.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/repository/store.go",
+          "internal/verification/service.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Open",
+          "clone",
+          "Snapshot",
+          "Update",
+          "persist",
+          "Verify",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "restart"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "部署运维-reserve-15",
+      "task_type": "部署运维",
+      "capability_family": "停止认可与历史复核关系",
+      "subject": "停止认可与历史复核关系",
+      "state": "retire",
+      "invariant": "停止认可与历史复核关系不被错误等同",
+      "observable": "部署运维针对停止认可与历史复核关系的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "retire"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "泛Agent需求-reserve-11",
+      "task_type": "泛Agent需求",
+      "capability_family": "证书DER身份与接收来源",
+      "subject": "证书DER身份与接收来源",
+      "state": "certificates",
+      "invariant": "证书DER身份与接收来源不被错误等同",
+      "observable": "泛Agent需求针对证书DER身份与接收来源的独立结果",
+      "primary_mechanism": "snapshot_consistency",
+      "source_anchors": [
+        "internal/authority/certificates.go",
+        "internal/chain/build.go",
+        "internal/transport/inputs.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/certificates.go",
+          "internal/chain/build.go",
+          "internal/transport/inputs.go"
+        ],
+        "functions": [
+          "ImportCertificate",
+          "Build",
+          "importCertificate",
+          "putTrust",
+          "retireTrust",
+          "importArtifact",
+          "importSignature",
+          "importCRL",
+          "createPolicy"
+        ]
+      },
+      "workflow_ids": [
+        "certificates"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "泛Agent需求-reserve-12",
+      "task_type": "泛Agent需求",
+      "capability_family": "自签CA事实与接收方信任认可",
+      "subject": "自签CA事实与接收方信任认可",
+      "state": "trust",
+      "invariant": "自签CA事实与接收方信任认可不被错误等同",
+      "observable": "泛Agent需求针对自签CA事实与接收方信任认可的独立结果",
+      "primary_mechanism": "state_machine",
+      "source_anchors": [
+        "internal/authority/trust.go",
+        "internal/verification/material.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/authority/trust.go",
+          "internal/verification/material.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "PutTrust",
+          "Retire",
+          "Capture",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "trust"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "泛Agent需求-reserve-13",
+      "task_type": "泛Agent需求",
+      "capability_family": "内容摘要与声明摘要一致性",
+      "subject": "内容摘要与声明摘要一致性",
+      "state": "artifact",
+      "invariant": "内容摘要与声明摘要一致性不被错误等同",
+      "observable": "泛Agent需求针对内容摘要与声明摘要一致性的独立结果",
+      "primary_mechanism": "versioning_audit",
+      "source_anchors": [
+        "internal/artifact/ingest.go",
+        "internal/signature/ingest.go",
+        "internal/evidence/bundle.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/artifact/ingest.go",
+          "internal/signature/ingest.go",
+          "internal/evidence/bundle.go"
+        ],
+        "functions": [
+          "Import",
+          "digest",
+          "Export",
+          "Replay"
+        ]
+      },
+      "workflow_ids": [
+        "artifact"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "泛Agent需求-reserve-14",
+      "task_type": "泛Agent需求",
+      "capability_family": "制品签名与证书签发的区别",
+      "subject": "制品签名与证书签发的区别",
+      "state": "signature",
+      "invariant": "制品签名与证书签发的区别不被错误等同",
+      "observable": "泛Agent需求针对制品签名与证书签发的区别的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/signature/ingest.go",
+        "internal/policy/assess.go",
+        "internal/verification/evaluate.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/signature/ingest.go",
+          "internal/policy/assess.go",
+          "internal/verification/evaluate.go"
+        ],
+        "functions": [
+          "Import",
+          "Assess",
+          "Evaluate"
+        ]
+      },
+      "workflow_ids": [
+        "signature"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    },
+    {
+      "id": "泛Agent需求-reserve-15",
+      "task_type": "泛Agent需求",
+      "capability_family": "策略版本与默认规则选择",
+      "subject": "策略版本与默认规则选择",
+      "state": "policy",
+      "invariant": "策略版本与默认规则选择不被错误等同",
+      "observable": "泛Agent需求针对策略版本与默认规则选择的独立结果",
+      "primary_mechanism": "policy_rules",
+      "source_anchors": [
+        "internal/policy/service.go",
+        "internal/verification/evaluate.go",
+        "internal/evidence/compare.go"
+      ],
+      "existing_touch_points": {
+        "files": [
+          "internal/policy/service.go",
+          "internal/verification/evaluate.go",
+          "internal/evidence/compare.go"
+        ],
+        "functions": [
+          "Create",
+          "Select",
+          "Evaluate",
+          "Compare"
+        ]
+      },
+      "workflow_ids": [
+        "policy"
+      ],
+      "capacity_note": "源码分析储备方向，尚未逐题证明新意或平台适用性，不计入准入题数"
+    }
+  ]
+}

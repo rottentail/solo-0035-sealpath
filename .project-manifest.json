@@ -1,0 +1,338 @@
+{
+  "project_name": "solo-0035-sealpath",
+  "title": "Sealpath",
+  "project_shape": "backend",
+  "description": "证书链与软件发行签名证据验证服务",
+  "modules": [
+    {
+      "id": "model",
+      "path": "internal/model",
+      "responsibility": "验证对象与证据身份"
+    },
+    {
+      "id": "codec",
+      "path": "internal/codec",
+      "responsibility": "DER、PEM与确定JSON身份"
+    },
+    {
+      "id": "repository",
+      "path": "internal/repository",
+      "responsibility": "状态原子持久化及引用完整性"
+    },
+    {
+      "id": "authority",
+      "path": "internal/authority",
+      "responsibility": "证书接收及根集合生命周期"
+    },
+    {
+      "id": "chain",
+      "path": "internal/chain",
+      "responsibility": "代码签名证书路径构造"
+    },
+    {
+      "id": "revocation",
+      "path": "internal/revocation",
+      "responsibility": "CRL接收与时点撤销判断"
+    },
+    {
+      "id": "artifact",
+      "path": "internal/artifact",
+      "responsibility": "制品内容与摘要"
+    },
+    {
+      "id": "signature",
+      "path": "internal/signature",
+      "responsibility": "分离签名密码学校验"
+    },
+    {
+      "id": "policy",
+      "path": "internal/policy",
+      "responsibility": "版本化安全规则与约束判断"
+    },
+    {
+      "id": "verification",
+      "path": "internal/verification",
+      "responsibility": "固定证据并组合验证决定"
+    },
+    {
+      "id": "evidence",
+      "path": "internal/evidence",
+      "responsibility": "原证据导出、重放与差异解释"
+    },
+    {
+      "id": "transport",
+      "path": "internal/transport",
+      "responsibility": "HTTP输入输出、限额与错误语义"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "certificates",
+      "name": "接收签名证书",
+      "entry": "POST /v1/certificates",
+      "module_ids": [
+        "transport",
+        "authority",
+        "codec",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "有效证书按DER身份接收",
+      "failure": "拒绝破损或多证书混合材料",
+      "verification": "go run ./cmd/sample -workflow certificates"
+    },
+    {
+      "id": "trust",
+      "name": "配置信任根",
+      "entry": "POST /v1/trust-sets",
+      "module_ids": [
+        "transport",
+        "authority",
+        "codec",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "显式根集合按修订提交",
+      "failure": "拒绝非自签CA和过期修订提交",
+      "verification": "go run ./cmd/sample -workflow trust"
+    },
+    {
+      "id": "artifact",
+      "name": "接收发行制品",
+      "entry": "POST /v1/artifacts",
+      "module_ids": [
+        "transport",
+        "artifact",
+        "codec",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "按真实内容摘要保存",
+      "failure": "内容不符或容量不足时拒绝",
+      "verification": "go run ./cmd/sample -workflow artifact"
+    },
+    {
+      "id": "signature",
+      "name": "接收分离签名",
+      "entry": "POST /v1/signatures",
+      "module_ids": [
+        "transport",
+        "signature",
+        "artifact",
+        "authority",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "密码学验证后保存引用",
+      "failure": "错误签名与缺失引用拒绝",
+      "verification": "go run ./cmd/sample -workflow signature"
+    },
+    {
+      "id": "policy",
+      "name": "建立策略版本",
+      "entry": "POST /v1/policies",
+      "module_ids": [
+        "transport",
+        "policy",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "追加不可变规则版本",
+      "failure": "非法算法与版本冲突拒绝",
+      "verification": "go run ./cmd/sample -workflow policy"
+    },
+    {
+      "id": "revocation",
+      "name": "接收签名撤销声明",
+      "entry": "POST /v1/revocations",
+      "module_ids": [
+        "transport",
+        "revocation",
+        "codec",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "校验签发者后保存有序CRL",
+      "failure": "错误签发者和回退序号拒绝",
+      "verification": "go run ./cmd/sample -workflow revocation"
+    },
+    {
+      "id": "verify",
+      "name": "形成完整验证决定",
+      "entry": "POST /v1/decisions",
+      "module_ids": [
+        "transport",
+        "verification",
+        "chain",
+        "revocation",
+        "policy",
+        "signature",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "按明确时间固定证据形成结果",
+      "failure": "非法引用请求拒绝；失效证据产生拒绝决定",
+      "verification": "go run ./cmd/sample -workflow verify"
+    },
+    {
+      "id": "unknown",
+      "name": "解释证据不足",
+      "entry": "POST /v1/decisions",
+      "module_ids": [
+        "transport",
+        "verification",
+        "revocation",
+        "policy"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "严格策略下未确认撤销状态保持不确定",
+      "failure": "不会把缺证据误写成未撤销",
+      "verification": "go run ./cmd/sample -workflow unknown"
+    },
+    {
+      "id": "history",
+      "name": "读取历史决定",
+      "entry": "GET /v1/decisions/{id}",
+      "module_ids": [
+        "transport",
+        "verification",
+        "policy",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "新策略不改变旧决定",
+      "failure": "不存在的决定引用返回明确错误",
+      "verification": "go run ./cmd/sample -workflow history"
+    },
+    {
+      "id": "bundle",
+      "name": "导出并复核证据包",
+      "entry": "GET /v1/decisions/{id}/bundle; POST /v1/evidence/replay",
+      "module_ids": [
+        "transport",
+        "evidence",
+        "verification",
+        "chain",
+        "revocation",
+        "codec"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "内容固定且可重复复核",
+      "failure": "拒绝内容损坏及不能复现的决定",
+      "verification": "go run ./cmd/sample -workflow bundle"
+    },
+    {
+      "id": "compare",
+      "name": "比较证据变化的决定",
+      "entry": "GET /v1/evidence/compare",
+      "module_ids": [
+        "transport",
+        "evidence",
+        "revocation",
+        "verification"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "按字段和检查项解释差异",
+      "failure": "拒绝不存在的决定",
+      "verification": "go run ./cmd/sample -workflow compare"
+    },
+    {
+      "id": "restart",
+      "name": "恢复完整状态",
+      "entry": "service startup",
+      "module_ids": [
+        "transport",
+        "repository",
+        "model",
+        "codec"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "已提交决定和引用完整恢复",
+      "failure": "损坏或不兼容状态拒绝启动",
+      "verification": "go run ./cmd/sample -workflow restart"
+    },
+    {
+      "id": "retire",
+      "name": "退役信任集合",
+      "entry": "POST /v1/trust-sets/{id}/retire",
+      "module_ids": [
+        "transport",
+        "authority",
+        "verification",
+        "repository"
+      ],
+      "steps": [
+        "从真实接口接收材料并检查引用",
+        "执行领域校验与证据处理",
+        "生成可观察结果或保存完整状态"
+      ],
+      "success": "拒绝新认可但保留历史读取",
+      "failure": "过期修订和重复退役拒绝",
+      "verification": "go run ./cmd/sample -workflow retire"
+    }
+  ],
+  "complexity": {
+    "mechanisms": [
+      "state_machine",
+      "resource_lifecycle",
+      "error_propagation",
+      "concurrency",
+      "versioning_audit",
+      "recovery_rollback",
+      "export_freeze",
+      "time_semantics",
+      "capacity",
+      "policy_rules",
+      "lineage",
+      "snapshot_consistency"
+    ]
+  }
+}

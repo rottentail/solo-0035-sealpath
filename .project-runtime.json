@@ -1,0 +1,63 @@
+{
+  "language": "Go",
+  "project_shape": "backend",
+  "source_extensions": [
+    ".go"
+  ],
+  "build_command": "go build ./...",
+  "testing": "deferred",
+  "workflow_checks": [
+    {
+      "workflow_id": "certificates",
+      "command": "go run ./cmd/sample -workflow certificates"
+    },
+    {
+      "workflow_id": "trust",
+      "command": "go run ./cmd/sample -workflow trust"
+    },
+    {
+      "workflow_id": "artifact",
+      "command": "go run ./cmd/sample -workflow artifact"
+    },
+    {
+      "workflow_id": "signature",
+      "command": "go run ./cmd/sample -workflow signature"
+    },
+    {
+      "workflow_id": "policy",
+      "command": "go run ./cmd/sample -workflow policy"
+    },
+    {
+      "workflow_id": "revocation",
+      "command": "go run ./cmd/sample -workflow revocation"
+    },
+    {
+      "workflow_id": "verify",
+      "command": "go run ./cmd/sample -workflow verify"
+    },
+    {
+      "workflow_id": "unknown",
+      "command": "go run ./cmd/sample -workflow unknown"
+    },
+    {
+      "workflow_id": "history",
+      "command": "go run ./cmd/sample -workflow history"
+    },
+    {
+      "workflow_id": "bundle",
+      "command": "go run ./cmd/sample -workflow bundle"
+    },
+    {
+      "workflow_id": "compare",
+      "command": "go run ./cmd/sample -workflow compare"
+    },
+    {
+      "workflow_id": "restart",
+      "command": "go run ./cmd/sample -workflow restart"
+    },
+    {
+      "workflow_id": "retire",
+      "command": "go run ./cmd/sample -workflow retire"
+    }
+  ]
+}
